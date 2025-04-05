@@ -5,6 +5,7 @@ import { DateInput, Input, Button, Select, SelectItem, NumberInput, Autocomplete
 import { countries } from "@selfxyz/qrcode";
 import { useSignMessage, useAccount } from 'wagmi';
 import { useCallback } from 'react';
+import toast from 'react-hot-toast';
 
 
 type VerificationType = "wld" | "uber" | "nft" | "self";
@@ -95,6 +96,7 @@ const Create: React.FC = () => {
 			if (!response.ok) {
 				throw new Error('Failed to save configuration');
 			}
+			toast.success('Configuration saved successfully');
 
 			const result = await response.json();
 			console.log('Saved configuration:', result);

@@ -131,8 +131,12 @@ export default function RewardModal({ isOpen, onOpenChange, selectedItem }: Rewa
 						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify({ rewardID: selectedItem.id, accountAddress: address, email: uberEmail, nft: nftAddress, userId: selfUserId }),
-				}).then(() => {
-					toast.success("Reward verified successfully");
+				}).then((response) => {
+					if (response.ok) {
+						toast.success("Reward verified successfully");
+					} else {
+						toast.error("Error verifying reward");
+					}
 				}).catch(error => {
 					console.error(error);
 					toast.error("Error verifying reward");
