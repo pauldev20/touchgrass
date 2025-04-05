@@ -4,6 +4,9 @@ import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, NavbarMen
 import { usePathname } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { useState } from "react";
+import Image from "next/image";
+
+import logo from "../app/icon.png";
 
 const menuItems = [
 	{
@@ -56,8 +59,9 @@ export default function CustomNavbar() {
 					aria-label={isMenuOpen ? "Close menu" : "Open menu"}
 					className="sm:hidden"
 				/>
-				<NavbarBrand>
-					<p className="font-bold text-inherit">{siteConfig.name}</p>
+				<NavbarBrand className="flex items-center gap-2">
+					<Image src={logo} alt="logo" width={27} height={27} />
+					<p className="font-bold text-xl text-inherit">{siteConfig.name}</p>
 				</NavbarBrand>
 			</NavbarContent>
 

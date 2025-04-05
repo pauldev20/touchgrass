@@ -1,6 +1,6 @@
 import "@/styles/globals.css";
 import { siteConfig } from "@/config/site";
-import { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 import clsx from "clsx";

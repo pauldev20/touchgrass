@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import SelfQRcodeWrapper, { SelfAppBuilder } from '@selfxyz/qrcode';
 import { v4 as uuidv4 } from 'uuid';
 import { SelfBackendVerifier } from '@selfxyz/core';
+import { Button, Card, CardBody, CardFooter, CardHeader, Chip } from '@heroui/react';
 
 const selfBackendVerifier = new SelfBackendVerifier(
     "my-app-scope",
@@ -43,6 +44,32 @@ const redeemableItems = [
   },
 ];
 
+function ClaimCard({ image, title, description, date, handleRedeem }: { image: string, title: string, description: string, date: string, handleRedeem: () => void }) {
+	return (
+		<Card className="h-[424px] w-[320px] border border-gray-700 bg-neutral-900" radius="sm">
+			<div className='absolute top-0 left-0 right-0 flex items-start justify-center'>
+				<h1 className="text-[180px]">
+					{image}
+				</h1>
+			</div>
+			<Chip className="absolute top-2 right-2" variant="bordered" color="default" radius="sm" size="sm">
+				{date}
+			</Chip>
+			<CardFooter className="flex flex-col items-start gap-2 mt-auto">
+				<h2 className="text-2xl">
+					{title}
+				</h2>
+				<p className="text-default-500 text-sm leading-relaxed line-clamp-2">
+					{description}
+				</p>
+				<Button color="primary" fullWidth={true} onPress={() => handleRedeem()}>
+					Claim Reward
+				</Button>
+			</CardFooter>
+		</Card>
+	)
+}
+
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -74,44 +101,17 @@ export default function Home() {
   };
 
   return (
-    <section className="flex flex-col items-center">
-      <h1 className="text-5xl font-bold text-center mb-16">
-        Claim Your Rewards
-      </h1>
-        
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section className="h-full z-20 flex flex-col items-center justify-center gap-[18px] sm:gap-6">
+
+	  {/* Redeem Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {redeemableItems.map((item) => (
-          <div 
-            key={item.id} 
-            className="group bg-background/40 backdrop-blur-sm rounded-3xl p-8 
-              border border-default-200 hover:border-default-400
-              transition-all duration-300"
-          >
-            <div className="flex flex-col items-center">
-              <div className="text-6xl mb-8 transform group-hover:scale-110 transition-transform duration-300">
-                {item.image}
-              </div>
-              <h2 className="text-2xl font-bold mb-3">
-                {item.title}
-              </h2>
-              <p className="text-default-500 text-center mb-8 text-sm leading-relaxed">
-                {item.description}
-              </p>
-              <button
-                onClick={() => handleRedeem(item.id)}
-                className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-medium 
-                  hover:opacity-90 active:opacity-80 transition-all duration-200
-                  transform group-hover:-translate-y-1"
-              >
-                Claim Now
-              </button>
-            </div>
-          </div>
+			<ClaimCard key={item.id} image={item.image} title={item.title} description={item.description} date={"22.03.2025"} handleRedeem={() => handleRedeem(item.id)} />
         ))}
       </div>
 
       {/* Verification Modal */}
-      {isOpen && (
+      {/* {isOpen && (
         <div 
           className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={handleModalClick}
@@ -163,7 +163,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </section>
   );
 }

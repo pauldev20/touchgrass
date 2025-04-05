@@ -1,5 +1,6 @@
 "use client";
 
+import { siteConfig } from "@/config/site";
 import { Button } from "@heroui/react";
 
 export default function Home() {
@@ -18,8 +19,7 @@ export default function Home() {
             </div>
           </div>
           <p className="text-center font-normal leading-7 text-default-500 sm:w-[466px] sm:text-[18px]">
-            Acme makes running global teams simple. HR, Payroll, International Employment,
-            contractor management and more.
+            {siteConfig.description}
           </p>
           <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
             <Button
