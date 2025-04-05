@@ -205,22 +205,24 @@ export async function POST(request: Request) {
                     }
                     break;
                 }
+				case 'self': {
+					console.log("verifying self")
+					const validation = await prisma.validation.findMany({
+						where: {
+							userId: userId,
+							rewardId: rewardID
+						}
+					});
+					if (validation.length === 0) {
+						return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
+					}
+					if (!validation[0].verified) {
+						return NextResponse.json({ error: 'User not verified' }, { status: 400 });
+					}
+					break;
+				}
             }
         }
-
-		const validation = await prisma.validation.findMany({
-			where: {
-				userId: userId,
-				rewardId: rewardID
-			}
-		});
-		if (validation.length === 0) {
-			return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
-		}
-		if (!validation[0].verified) {
-			return NextResponse.json({ error: 'User not verified' }, { status: 400 });
-		}
-
         console.log("transferring reward tokens");
 
         const privateKey = process.env.NEXT_PRIVATE_KEY?.startsWith('0x') 
