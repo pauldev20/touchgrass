@@ -10,12 +10,10 @@ export default function Home() {
                 className="h-9 overflow-hidden border-1 border-default-100 bg-default-50 px-[18px] py-2 text-small font-normal leading-5 text-default-500"
                 radius="full"
                 variant="bordered"
-            >
-                A unique rewards experience
             </Button>
             <div className="text-center text-[clamp(40px,10vw,44px)] font-bold leading-[1.2] tracking-tighter sm:text-[64px]">
                 <div className="bg-hero-section-title bg-clip-text text-transparent">
-                    Easiest way to <br /> power global teams.
+                    Simply reimburse <br /> your members onchain.
                 </div>
             </div>
             <p className="text-center font-normal leading-7 text-default-500 sm:w-[466px] sm:text-[18px]">
@@ -26,7 +24,7 @@ export default function Home() {
                     className="h-10 w-[163px] bg-default-foreground px-[16px] py-[10px] text-small font-medium leading-5 text-background"
                     radius="full"
                 >
-                    Get Rewards
+                    Expense reimbursements made simple
                 </Button>
                 <Button
                     className="h-10 w-[163px] border-1 border-default-100 px-[16px] py-[10px] text-small font-medium leading-5"
