@@ -29,19 +29,19 @@ export default function Home() {
   }).build();
 
   return (
-    <div className="verification-container">
-      <h1>Verify Your Identity</h1>
-      <p>Scan this QR code with the Self app to verify your identity</p>
+    <div className="verification-container bg-white p-8 rounded-lg shadow-md">
+      <h1 className="text-black">Verify Your Identity</h1>
+      <p className="text-gray-700">Scan this QR code with the Self app to verify your identity</p>
       
-      <SelfQRcodeWrapper
-        selfApp={selfApp}
-        onSuccess={() => {
-          // Handle successful verification
-          console.log("Verification successful!");
-          // Redirect or update UI
-        }}
-        size={350}
-      />
+      <div className="bg-white p-4">
+        <SelfQRcodeWrapper
+          selfApp={selfApp}
+          onSuccess={() => {
+            console.log("Verification successful!");
+          }}
+          size={350}
+        />
+      </div>
       
       <p className="text-sm text-gray-500">
         User ID: {userId.substring(0, 8)}...
