@@ -20,19 +20,21 @@ export default function Home() {
                 {siteConfig.description}
             </p>
             <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
-                <Button
-                    className="h-10 w-[163px] bg-default-foreground px-[16px] py-[10px] text-small font-medium leading-5 text-background"
+                {/* <Button
+                    className="h-10 bg-default-foreground px-[16px] py-[10px] text-small font-medium leading-5 text-background"
                     radius="full"
+					href="/rewards"
                 >
                     Expense reimbursements made simple
-                </Button>
-                <Button
+                </Button> */}
+                {/* <Button
                     className="h-10 w-[163px] border-1 border-default-100 px-[16px] py-[10px] text-small font-medium leading-5"
                     radius="full"
                     variant="bordered"
+					href="/rewards"
                 >
                     About TouchGrass
-                </Button>
+                </Button> */}
             </div>
         </section>
     );
