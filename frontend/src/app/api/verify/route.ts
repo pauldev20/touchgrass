@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 // import { useReadContract } from 'wagmi';
 // import { useAccount } from 'wagmi';
 import { createPublicClient, http, getContract, createWalletClient, erc20Abi } from 'viem'
-import { baseSepolia, optimism } from 'viem/chains'
+import { baseSepolia, flowTestnet, optimism } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
 import prisma from '@/lib/db';
 
@@ -160,12 +160,24 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { rewardID, accountAddress, email, nft, userId } = body;
 
-        const configResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/config`);
-        const configs = await configResponse.json();
-        const config = configs.rewards.find((c: any) => c.id === rewardID);
-
+		const reward = await prisma.reward.findUnique({
+			where: {
+				id: rewardID
+			}
+		});
+		if (!reward) {
+			return NextResponse.json({ error: 'Invalid reward ID' }, { status: 400 });
+		}
+		const config = {
+			...reward,
+			requirements: JSON.parse(reward?.requirements!)
+		};
+        // const configResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/config`);
+        // const configs = await configResponse.json();
+        // const config = configs.rewards.find((c: any) => c.id === rewardID);
+		
         if (!config) {
-            return NextResponse.json({ error: 'Invalid reward ID' }, { status: 400 });
+			return NextResponse.json({ error: 'Invalid reward ID' }, { status: 400 });
         }
 
         for (const requirement of config.requirements) {
@@ -218,23 +230,23 @@ export async function POST(request: Request) {
         
         const client = createWalletClient({
             account: accountP,
-            chain: baseSepolia,
+            chain: flowTestnet,
             transport: http(),
         });
     
         try {
             const hash = await client.writeContract({
                 account: accountP,
-                address: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+                address: process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`,
                 abi: erc20Abi,
                 functionName: 'transferFrom',
                 args: [
                     config.wallet as `0x${string}`,
                     accountAddress as `0x${string}`,
-                    BigInt(10),
+                    BigInt(config?.amount!),
                 ],
             });
-    
+
             console.log('Transaction sent:', hash);
             return new Response(JSON.stringify({ hash }), { status: 200 });
         } catch (error) {

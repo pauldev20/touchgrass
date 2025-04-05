@@ -15,6 +15,7 @@ model Reward {
 	emoji 			String
 	requirements 	String
 	wallet 			String
+	amount 			Int			@default(10)
 	createdAt 		DateTime 	@default(now())
 	updatedAt 		DateTime 	@updatedAt
 }

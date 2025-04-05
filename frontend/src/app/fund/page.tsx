@@ -5,7 +5,7 @@ import { DateInput, Input, Button, Select, SelectItem, NumberInput } from "@hero
 import { useSignMessage, useAccount, useReadContract, useWriteContract } from 'wagmi';
 import { parseUnits } from 'viem';
 
-const USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e' as `0x${string}`;
+const USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`;
 const ALLOW_ADDRESS = '0x0880F49F371d8518f608D6e42c103acd020F007A' as `0x${string}`;
 
 const Fund: React.FC = () => {

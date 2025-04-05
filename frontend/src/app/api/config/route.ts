@@ -84,7 +84,8 @@ export async function POST(request: Request) {
 			description: configData.description,
 			emoji: configData.emoji,
 			requirements: JSON.stringify(configData.requirements),
-			wallet: configData.wallet
+			wallet: configData.wallet,
+			amount: configData.amount
 		}
 	});
 
@@ -105,8 +106,7 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const rewards = await prisma.reward.findMany();
-    
-    // Parse the requirements back to objects since they're stored as strings
+
     const formattedRewards = rewards.map((reward: any) => ({
       ...reward,
       requirements: JSON.parse(reward.requirements)

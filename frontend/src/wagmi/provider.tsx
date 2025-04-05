@@ -1,7 +1,7 @@
 "use client";
 
 import { siteConfig } from "@/config/site";
-import { baseSepolia } from "@reown/appkit/networks";
+import { baseSepolia, flowTestnet } from "@reown/appkit/networks";
 import { createAppKit } from "@reown/appkit/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React, { type ReactNode } from "react";
@@ -25,8 +25,8 @@ const metadata = {
 createAppKit({
     adapters: [wagmiAdapter],
     projectId,
-    networks: [baseSepolia],
-    defaultNetwork: baseSepolia,
+    networks: [flowTestnet],
+    defaultNetwork: flowTestnet,
     metadata: metadata,
     features: {
         analytics: false,
