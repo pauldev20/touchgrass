@@ -1,0 +1,181 @@
+To verify proofs, call the verify method.
+
+Copy
+import { SelfVerificationResult } from '@selfxyz/core';
+
+const result: SelfVerificationResult = await selfBackendVerifier.verify(request.body.proof, request.body.publicSignals);
+This is the format the API returns:
+
+Copy
+response: {
+    200: t.Object({
+        status: t.String(),
+        result: t.Boolean(),
+    }),
+    500: t.Object({
+        status: t.String(),
+        result: t.Boolean(),
+        message: t.String(),
+    }),
+},
+Example API implementation
+This is how an example API implementation would look like this: 
+
+Copy
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getUserIdentifier, SelfBackendVerifier, countryCodes } from '@selfxyz/core';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
+    try {
+      const { proof, publicSignals } = req.body;
+
+      if (!proof || !publicSignals) {
+        return res.status(400).json({ message: 'Proof and publicSignals are required' });
+      }
+
+      // Extract user ID from the proof
+      const userId = await getUserIdentifier(publicSignals);
+      console.log("Extracted userId:", userId);
+
+      // Initialize and configure the verifier
+      const selfBackendVerifier = new SelfBackendVerifier(
+        'my-application-scope', 
+        'https://myapp.com/api/verify'
+      );
+
+      // Verify the proof
+      const result = await selfBackendVerifier.verify(proof, publicSignals);
+      
+      if (result.isValid) {
+        // Return successful verification response
+        return res.status(200).json({
+          status: 'success',
+          result: true,
+          credentialSubject: result.credentialSubject
+        });
+      } else {
+        // Return failed verification response
+        return res.status(500).json({
+          status: 'error',
+          result: false,
+          message: 'Verification failed',
+          details: result.isValidDetails
+        });
+      }
+    } catch (error) {
+      console.error('Error verifying proof:', error);
+      return res.status(500).json({
+        status: 'error',
+        result: false,
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  } else {
+    return res.status(405).json({ message: 'Method not allowed' });
+  }
+}
+Add the QR code generator to your front-end
+QRCodeGenerator is a React component for generating QR codes for Self passport verification.
+
+Installation
+npm
+yarn
+bun
+Copy
+bun install @selfxyz/qrcode
+Basic Usage
+1. Import the SelfQRcode component
+Copy
+import SelfQRcodeWrapper, { SelfAppBuilder, SelfQRcode } from '@selfxyz/qrcode';
+import { v4 as uuidv4 } from 'uuid';
+2. Create a SelfApp instance using SelfAppBuilder 
+Copy
+// Generate a unique user ID
+const userId = uuidv4();
+
+// Create a SelfApp instance using the builder pattern
+const selfApp = new SelfAppBuilder({
+  appName: "My App",
+  scope: "my-app-scope", 
+  endpoint: "https://myapp.com/api/verify",
+  endpointType: "https",
+  logoBase64: "<base64EncodedLogo>", // Optional, accepts also PNG url
+  userId,
+}).build();
+Note that if you're choosing the endpointType to be https , the endpoint field must be accessible for anyone to call it (i.e., not localhost). The reason is that the Self backend relayer calls this endpoint to verify the proof.
+
+Be careful and use the same scope here as you used in the backend code shown above.
+
+3. Render the QR code component
+Copy
+function MyComponent() {
+  return (
+    <SelfQRcodeWrapper
+      selfApp={selfApp}
+      onSuccess={() => {
+        console.log('Verification successful');
+        // Perform actions after successful verification
+      }}
+    />
+  );
+}
+SelfQRcodeWrapper wraps SelfQRcode to prevent server-side rendering when using nextjs. When not using nextjs, SelfQRcode can be used instead.
+
+Your scope is an identifier for your application. It makes sure people can't use proofs destined for other applications in yours. You'll have to use the same scope in the backend verification SDK if you need to verify proofs offchain, or in your contract if you verify them onchain. Make sure it's no longer than 25 characters.
+
+The userId is the unique identifier of your user. It ties them to their proof. You want to verify the proof offchain, you can use a standard uuid. If you want to verify it onchain, you should use the user's address so no one can steal their proof and use it with another address.
+
+To see how you can configure your SelfApp  take a look atSelfAppBuilder. You can also find the SDK reference forSelfQRcodeWrapper.
+
+Complete Example
+Here's a complete example of how to implement the Self QR code in a NextJS application:
+
+Copy
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import SelfQRcodeWrapper, { SelfAppBuilder } from '@selfxyz/qrcode';
+import { v4 as uuidv4 } from 'uuid';
+
+function VerificationPage() {
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Generate a user ID when the component mounts
+    setUserId(uuidv4());
+  }, []);
+
+  if (!userId) return null;
+
+  // Create the SelfApp configuration
+  const selfApp = new SelfAppBuilder({
+    appName: "My Application",
+    scope: "my-application-scope",
+    endpoint: "https://myapp.com/api/verify",
+    userId,
+  }).build();
+
+  return (
+    <div className="verification-container">
+      <h1>Verify Your Identity</h1>
+      <p>Scan this QR code with the Self app to verify your identity</p>
+      
+      <SelfQRcodeWrapper
+        selfApp={selfApp}
+        onSuccess={() => {
+          // Handle successful verification
+          console.log("Verification successful!");
+          // Redirect or update UI
+        }}
+        size={350}
+      />
+      
+      <p className="text-sm text-gray-500">
+        User ID: {userId.substring(0, 8)}...
+      </p>
+    </div>
+  );
+}
+
+export default VerificationPage;
