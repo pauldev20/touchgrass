@@ -117,8 +117,7 @@ export default function Home() {
           onClick={handleModalClick}
         >
           <div 
-            className="bg-background rounded-3xl shadow-2xl relative max-w-md w-full mx-auto
-              border border-default-200"
+            className="bg-white rounded-3xl shadow-2xl relative max-w-md w-full mx-auto"
           >
             <div className="p-10">
               <button
@@ -126,8 +125,8 @@ export default function Home() {
                   setIsOpen(false);
                   setSelectedItem(null);
                 }}
-                className="absolute top-8 right-8 text-default-500 hover:text-default-600 
-                  transition-colors p-2 hover:bg-default-100 rounded-full"
+                className="absolute top-8 right-8 text-gray-500 hover:text-gray-700 
+                  transition-colors p-2 hover:bg-gray-100 rounded-full"
               >
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -135,10 +134,10 @@ export default function Home() {
               </button>
               
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-3">
+                <h2 className="text-3xl font-bold mb-3 text-black">
                   Verify to Claim
                 </h2>
-                <p className="text-default-500">
+                <p className="text-gray-500">
                   Claiming: {redeemableItems.find(item => item.id === selectedItem)?.title}
                 </p>
               </div>
@@ -158,7 +157,7 @@ export default function Home() {
                 )}
               </div>
               
-              <p className="text-sm text-default-400 mt-6 text-center">
+              <p className="text-sm text-gray-500 mt-6 text-center">
                 ID: {userId?.substring(0, 8)}...
               </p>
             </div>
