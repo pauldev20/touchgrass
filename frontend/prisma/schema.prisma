@@ -18,3 +18,12 @@ model Reward {
 	createdAt 		DateTime 	@default(now())
 	updatedAt 		DateTime 	@updatedAt
 }
+
+model Validation {
+	id 				String 		@id @default(uuid())
+	userId 			String
+	rewardId 		String
+	verified 		Boolean 	@default(false)
+	createdAt 		DateTime 	@default(now())
+	updatedAt 		DateTime 	@updatedAt
+}

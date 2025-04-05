@@ -1,8 +1,11 @@
 import { countries, SelfBackendVerifier } from '@selfxyz/core';
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/db';
 
 export async function POST(request: Request) {
     try {
+		const requestParams = new URL(request.url).searchParams;
+		const rewardId = requestParams.get('id');
         const body = await request.json();
         const { proof, publicSignals } = body;
 
@@ -13,8 +16,6 @@ export async function POST(request: Request) {
             );
         }
 
-		console.log(proof, publicSignals);
-
         const configuredVerifier = new SelfBackendVerifier(
             "touchgrass",
             `${process.env.NEXT_PUBLIC_API_URL}`,
@@ -23,8 +24,16 @@ export async function POST(request: Request) {
         ).excludeCountries(countries.FRANCE);
 
         const result = await configuredVerifier.verify(proof, publicSignals);
-        console.log("Verification result:", result);
+        console.log("Verification result:", result, result.userId);
         console.log('credentialSubject', result.credentialSubject);
+
+		await prisma.validation.create({
+			data: {
+				userId: result.userId,
+				rewardId: rewardId!,
+				verified: result.isValid
+			}
+		});
 
         if (result.isValid) {
             return NextResponse.json({

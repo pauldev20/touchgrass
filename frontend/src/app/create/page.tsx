@@ -4,6 +4,7 @@ import * as React from 'react';
 import { DateInput, Input, Button, Select, SelectItem, NumberInput, Autocomplete } from "@heroui/react";
 import { countries } from "@selfxyz/qrcode";
 import { useSignMessage, useAccount } from 'wagmi';
+import { useCallback } from 'react';
 
 
 type VerificationType = "wld" | "uber" | "nft" | "self";
@@ -34,7 +35,7 @@ const Create: React.FC = () => {
 	// 	console.log(value)
 	// }
 
-	const addElement = () => {
+	const addElement = useCallback(() => {
 		if (!selectedType) {
 			return;
 		}
@@ -48,7 +49,7 @@ const Create: React.FC = () => {
 
 		setElements([...elements, newElement]);
 		setSelectedType(null);
-	};
+	}, [elements, selectedType, country]);
 
 	const removeElement = (id: string) => {
 		setElements(elements.filter(el => el.id !== id));
@@ -69,8 +70,7 @@ const Create: React.FC = () => {
 				amount,
 				requirements: elements,
 				description,
-				emoji,
-				country
+				emoji
 			};
 
 			// Sign the stringified config

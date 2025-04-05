@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { createPublicClient, http, getContract, createWalletClient, erc20Abi } from 'viem'
 import { baseSepolia, optimism } from 'viem/chains'
 import { privateKeyToAccount } from 'viem/accounts'
+import prisma from '@/lib/db';
 
 interface Coordinates {
   lat: number;
@@ -158,12 +159,11 @@ async function verifyNFT(nftAddress: string, accountAddress: string) {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { rewardID, accountAddress, email, nft } = body;
+        const { rewardID, accountAddress, email, nft, userId } = body;
 
         const configResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/config`);
         const configs = await configResponse.json();
         const config = configs.rewards.find((c: any) => c.id === rewardID);
-        console.log(config);
 
         if (!config) {
             return NextResponse.json({ error: 'Invalid reward ID' }, { status: 400 });
@@ -194,6 +194,20 @@ export async function POST(request: Request) {
                     break;
             }
         }
+
+		const validation = await prisma.validation.findMany({
+			where: {
+				userId: userId,
+				rewardId: rewardID
+			}
+		});
+		if (validation.length === 0) {
+			return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
+		}
+		if (!validation[0].verified) {
+			return NextResponse.json({ error: 'User not verified' }, { status: 400 });
+		}
+
         console.log("transferring reward tokens");
 
         const privateKey = process.env.NEXT_PRIVATE_KEY?.startsWith('0x') 

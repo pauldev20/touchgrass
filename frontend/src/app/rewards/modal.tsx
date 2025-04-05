@@ -9,7 +9,7 @@ import type { Reward } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { siteConfig } from "@/config/site";
 import { useAccount } from "wagmi";
-
+import toast from "react-hot-toast";
 
 function VerifyUberEmail({ onSuccess }: { onSuccess: (email: string) => void }) {
 	
@@ -58,7 +58,7 @@ function VerifyNFTHolding({ address, onSuccess }: { address: string, onSuccess: 
 	)
 }
 
-function VerifySelfProtocol({ country, onSuccess }: { country: string, onSuccess: (country: string) => void }) {
+function VerifySelfProtocol({ rewardId, country, onSuccess }: { rewardId: string, country: string, onSuccess: (userId: string) => void }) {
 	const [mounted, setMounted] = useState(false);
 	useEffect(() => {
 		setMounted(true);
@@ -68,7 +68,7 @@ function VerifySelfProtocol({ country, onSuccess }: { country: string, onSuccess
 	const selfApp = new SelfAppBuilder({
         appName: siteConfig.name,
         scope: "touchgrass",
-        endpoint: `${process.env.NEXT_PUBLIC_API_URL}/api/verifyself?test=true`,
+        endpoint: `${process.env.NEXT_PUBLIC_API_URL}/api/verifyself?id=${rewardId}`,
         userId,
 		disclosures: {
 			// excludedCountries: [country],
@@ -81,11 +81,11 @@ function VerifySelfProtocol({ country, onSuccess }: { country: string, onSuccess
 	}
 
 	return (
-		<div className="bg-white rounded-2xl p-3 flex justify-center" onClick={() => onSuccess(country)} onKeyDown={() => onSuccess(country)}>
+		<div className="bg-white rounded-2xl p-3 flex justify-center" onClick={() => onSuccess(userId)} onKeyDown={() => onSuccess(userId)}>
 			<SelfQRcodeWrapper
 				selfApp={selfApp}
 				onSuccess={() => {
-					onSuccess(country);
+					onSuccess(userId);
 				}}
 				size={250}
 			/>
@@ -105,7 +105,7 @@ export default function RewardModal({ isOpen, onOpenChange, selectedItem }: Rewa
 
 	const [uberEmail, setUberEmail] = useState<string | null>(null);
 	const [nftAddress, setNftAddress] = useState<string | null>(null);
-	const [selfCountry, setSelfCountry] = useState<string | null>(null);
+	const [selfUserId, setSelfUserId] = useState<string | null>(null);
 
 	const nftRequirement = requirements.find((req: any) => req.type === "nft");
 	const selfRequirement = requirements.find((req: any) => req.type === "self");
@@ -124,13 +124,23 @@ export default function RewardModal({ isOpen, onOpenChange, selectedItem }: Rewa
 		}
 		if (currentStep === steps[steps.length - 1]) {
 			onOpenChange(false);
-			fetch('/api/verify', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ rewardID: selectedItem.id, accountAddress: address, email: uberEmail, nft: nftAddress  }),
-			});
+			try {
+				fetch('/api/verify', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ rewardID: selectedItem.id, accountAddress: address, email: uberEmail, nft: nftAddress, userId: selfUserId }),
+				}).then(() => {
+					toast.success("Reward verified successfully");
+				}).catch(error => {
+					console.error(error);
+					toast.error("Error verifying reward");
+				});
+			} catch (error) {
+				console.error(error);
+				toast.error("Error verifying reward");
+			}
 		}
 	}, [currentStep]);
 
@@ -170,8 +180,8 @@ export default function RewardModal({ isOpen, onOpenChange, selectedItem }: Rewa
 						setNftAddress(address);
 						setCurrentStep(steps[steps.indexOf(currentStep) + 1]);
 					}} />}
-					{currentStep === "self" && <VerifySelfProtocol country={selfRequirement?.country} onSuccess={(country) => {
-						setSelfCountry(country);
+					{currentStep === "self" && <VerifySelfProtocol country={selfRequirement?.country} rewardId={selectedItem.id} onSuccess={(userId) => {
+						setSelfUserId(userId);
 						setCurrentStep(steps[steps.indexOf(currentStep) + 1]);
 					}} />}
 				</ModalBody>

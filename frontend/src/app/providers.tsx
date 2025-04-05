@@ -5,6 +5,7 @@ import { HeroUIProvider } from "@heroui/system";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ThemeProviderProps } from "next-themes";
 import { useRouter } from "next/navigation";
+import { Toaster } from 'react-hot-toast';
 
 export interface ProvidersProps {
     children: React.ReactNode;
@@ -26,6 +27,7 @@ export function Providers({ children, themeProps, cookies }: ProvidersProps) {
 			<HeroUIProvider navigate={router.push}>
 				<NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
 			</HeroUIProvider>
+			<Toaster />
 		</WagmiProvider>
     );
 }

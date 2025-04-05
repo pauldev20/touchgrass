@@ -52,9 +52,9 @@ function ClaimCard({
             <div className="absolute top-0 left-0 right-0 flex items-start justify-center">
                 <h1 className="text-[180px]">{emoji}</h1>
             </div>
-            <Chip className="absolute top-2 right-2" variant="bordered" color="default" radius="sm" size="sm">
+            {/* <Chip className="absolute top-2 right-2" variant="bordered" color="default" radius="sm" size="sm">
                 {date}
-            </Chip>
+            </Chip> */}
             <CardFooter className="flex flex-col items-start gap-2 mt-auto">
                 <h2 className="text-2xl">{title}</h2>
                 <p className="text-default-500 text-sm leading-relaxed line-clamp-2">{description}</p>
