@@ -22,10 +22,10 @@ export function Providers({ children, themeProps, cookies }: ProvidersProps) {
     const router = useRouter();
 
     return (
-        <HeroUIProvider navigate={router.push}>
-            <WagmiProvider cookies={cookies}>
-                <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
-            </WagmiProvider>
-        </HeroUIProvider>
+		<WagmiProvider cookies={cookies}>
+			<HeroUIProvider navigate={router.push}>
+				<NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
+			</HeroUIProvider>
+		</WagmiProvider>
     );
 }

@@ -22,6 +22,8 @@ const Create: React.FC = () => {
 	const [elements, setElements] = React.useState<VerificationElement[]>([]);
 	const [selectedType, setSelectedType] = React.useState<VerificationType | null>(null);
 	const [name, setName] = React.useState('');
+	const [description, setDescription] = React.useState('');
+	const [emoji, setEmoji] = React.useState('');
 	const [amount, setAmount] = React.useState<number>(0);
 
 	// const options = useMemo(() => countryList().getData(), [])
@@ -60,6 +62,8 @@ const Create: React.FC = () => {
 				name,
 				amount,
 				requirements: elements,
+				description,
+				emoji
 			};
 
 			// Sign the stringified config
@@ -88,10 +92,8 @@ const Create: React.FC = () => {
 			const result = await response.json();
 			console.log('Saved configuration:', result);
 			
-			// You might want to show a success message or redirect
 		} catch (error) {
 			console.error('Error saving configuration:', error);
-			// Handle error (show error message to user)
 		}
 	};
 
@@ -118,6 +120,21 @@ const Create: React.FC = () => {
 					/>
 				</div>
 
+				<Input
+					placeholder="Reward Description"
+					label="Reward Description"
+					isRequired={true}
+					value={description}
+					onChange={(e) => setDescription(e.target.value)}
+				/>
+				<Input
+					placeholder="Reward Emoji"
+					label="Reward Emoji"
+					isRequired={true}
+					value={emoji}
+					onChange={(e) => setEmoji(e.target.value)}
+				/>
+
 				<div className="w-full flex flex-row gap-4">
 					<Select 
 						value={selectedType || undefined}
@@ -130,7 +147,7 @@ const Create: React.FC = () => {
 						<SelectItem key="nft">NFT</SelectItem>
 						<SelectItem key="self">Self Protocol</SelectItem>
 					</Select>
-					<Button onClick={addElement} disabled={!selectedType}>Add Element</Button>
+					<Button onPress={addElement} disabled={!selectedType}>Add Element</Button>
 				</div>
 			</div>
 
@@ -139,7 +156,7 @@ const Create: React.FC = () => {
 					<div key={element.id} className="border p-4 rounded">
 						<div className="flex justify-between items-center">
 							<h3>{element.type.toUpperCase()}</h3>
-							<Button color="danger" onClick={() => removeElement(element.id)}>Remove</Button>
+							<Button color="danger" onPress={() => removeElement(element.id)}>Remove</Button>
 						</div>
 
 						{element.type === "nft" && (
@@ -177,7 +194,7 @@ const Create: React.FC = () => {
 						)}
 
 						{element.type === "self" && (
-							<div className="flex flex-col gap-4"></div>
+							<div className="flex flex-col gap-4" />
 						)}
 					</div>
 				))}

@@ -18,7 +18,7 @@ if (!projectId) {
 const metadata = {
     name: siteConfig.name,
     description: siteConfig.description,
-    url: "https://reown.com/appkit",
+    url: "http://localhost:3000",
     icons: ["https://assets.reown.com/reown-profile-pic.png"],
 };
 
@@ -30,6 +30,9 @@ createAppKit({
     metadata: metadata,
     features: {
         analytics: false,
+		socials: false,
+		swaps: false,
+		email: false
     },
 });
 

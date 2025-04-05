@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { verifyMessage } from 'viem';
+import prisma from '@/lib/db';
 
 interface ConfigRequest {
   wallet: string;
   name: string;
   amount: number;
+  description: string;
+  emoji: string;
   requirements: Array<{
     type: "wld" | "uber" | "nft" | "self";
     id: string;
@@ -34,12 +37,14 @@ export async function POST(request: Request) {
       name: body.name,
       amount: body.amount,
       requirements: body.requirements,
+	  description: body.description,
+	  emoji: body.emoji
     };
 
     // Verify the signature using viem
     const messageToVerify = JSON.stringify(configData);
     const isValid = await verifyMessage({
-      address: body.wallet,
+      address: body.wallet as `0x${string}`,
       message: messageToVerify,
       signature: body.signature as `0x${string}`,
     });
@@ -72,6 +77,15 @@ export async function POST(request: Request) {
           break;
       }
     }
+
+	await prisma.reward.create({
+		data: {
+			name: configData.name,
+			description: configData.description,
+			emoji: configData.emoji,
+			requirements: JSON.stringify(configData.requirements)
+		}
+	});
 
     return NextResponse.json({
       message: 'Configuration verified and saved successfully',
@@ -109,4 +123,4 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
