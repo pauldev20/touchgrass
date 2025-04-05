@@ -49,17 +49,36 @@ const Create: React.FC = () => {
 		));
 	};
 
-	const submitData = () => {
-		// either need to sign it or need to submit the hash to contract
-		
-		console.log({
-			wallet: "0x1234567890123456789012345678901234567890",
-			name,
-			amount,
-			requirements: elements,
-			signature: "0x1234567890123456789012345678901234567890"
-		})
-	}
+	const submitData = async () => {
+		try {
+			const config = {
+				wallet: "0x1234567890123456789012345678901234567890", // Replace with actual wallet
+				name,
+				amount,
+				requirements: elements,
+			};
+
+			const response = await fetch('/api/config', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(config),
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to save configuration');
+			}
+
+			const result = await response.json();
+			console.log('Saved configuration:', result);
+			
+			// You might want to show a success message or redirect
+		} catch (error) {
+			console.error('Error saving configuration:', error);
+			// Handle error (show error message to user)
+		}
+	};
 
 	return (
 		<div>
