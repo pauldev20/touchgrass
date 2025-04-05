@@ -67,14 +67,14 @@ export async function POST(request: Request) {
             );
           }
           break;
-        case 'uber':
-          if (!req.dateRange?.start || !req.dateRange?.end) {
-            return NextResponse.json(
-              { error: 'Missing date range for Uber verification' },
-              { status: 400 }
-            );
-          }
-          break;
+        // case 'uber':
+        //   if (!req.dateRange?.start || !req.dateRange?.end) {
+        //     return NextResponse.json(
+        //       { error: 'Missing date range for Uber verification' },
+        //       { status: 400 }
+        //     );
+        //   }
+        //   break;
       }
     }
 

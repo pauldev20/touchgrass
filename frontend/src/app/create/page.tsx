@@ -32,7 +32,9 @@ const Create: React.FC = () => {
 	// }
 
 	const addElement = () => {
-		if (!selectedType) return;
+		if (!selectedType) {
+			return;
+		}
 		
 		const newElement: VerificationElement = {
 			type: selectedType,
@@ -97,9 +99,16 @@ const Create: React.FC = () => {
 		}
 	};
 
+	if (!address) {
+		return (
+			<section className="h-full w-full z-20 flex flex-col items-center justify-start gap-4">
+				<h1 className="text-xl font-bold">Connect your wallet to create a verification requirements</h1>
+			</section>
+		)
+	}
+
 	return (
-		<div>
-		<section className="h-full w-full z-20 flex flex-col items-center justify-start gap-4">
+		<section className="h-full w-full max-w-screen-md z-20 flex flex-col items-center justify-start gap-4 mb-24">
 			<h1 className="text-2xl font-bold">Create Verification Requirements</h1>
 			
 			<div className="w-full flex flex-col gap-4">
@@ -135,19 +144,19 @@ const Create: React.FC = () => {
 					onChange={(e) => setEmoji(e.target.value)}
 				/>
 
-				<div className="w-full flex flex-row gap-4">
+				<div className="w-full flex flex-row items-center gap-4">
 					<Select 
 						value={selectedType || undefined}
 						onChange={(e) => setSelectedType(e.target.value as VerificationType)}
 						label="Add Verification"
 						placeholder="Select type"
 					>
-						<SelectItem key="wld">World ID</SelectItem>
+						{/* <SelectItem key="wld">World ID</SelectItem> */}
 						<SelectItem key="uber">Uber</SelectItem>
 						<SelectItem key="nft">NFT</SelectItem>
 						<SelectItem key="self">Self Protocol</SelectItem>
 					</Select>
-					<Button onPress={addElement} disabled={!selectedType}>Add Element</Button>
+					<Button onPress={addElement} isDisabled={!selectedType}>Add Element</Button>
 				</div>
 			</div>
 
@@ -183,13 +192,15 @@ const Create: React.FC = () => {
 										// })}
 									/>
 								</div>
-								<img 
-									src="/map.png"
-									alt="Map visualization"
-									width={600}
-									height={300}
-									className="rounded-lg mt-4"
-								/>
+								<div className='flex justify-center'>
+									<img 
+										src="/map.png"
+										alt="Map visualization"
+										width={600}
+										height={300}
+										className="rounded-lg mt-4"
+									/>
+								</div>
 							</>
 						)}
 
@@ -200,9 +211,10 @@ const Create: React.FC = () => {
 				))}
 			</div>
 
-			<Button color="primary" fullWidth={true} onPress={submitData}>Save Requirements</Button>
+			<div className="w-full flex flex-col gap-4">
+				<Button color="primary" fullWidth={true} onPress={submitData}>Save Requirements</Button>
+			</div>
 		</section>
-		</div>
 	);
 };
 

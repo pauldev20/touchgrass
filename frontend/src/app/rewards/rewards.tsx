@@ -71,10 +71,10 @@ interface RewardsProps {
 }
 export default function Rewards({ rewards }: RewardsProps) {
 	const {isOpen, onOpen, onOpenChange} = useDisclosure();
-    const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    const [selectedItem, setSelectedItem] = useState<Reward | null>(null);
 
-    const handleRedeem = (itemId: string) => {
-        setSelectedItem(itemId);
+    const handleRedeem = (item: Reward) => {
+        setSelectedItem(item);
         onOpen();
     };
 
@@ -94,13 +94,13 @@ export default function Rewards({ rewards }: RewardsProps) {
                         title={item.name}
                         description={item.description}
                         date={"22.03.2025"}
-                        handleRedeem={() => handleRedeem(item.id)}
+                        handleRedeem={() => handleRedeem(item)}
                     />
                 ))}
             </div>
 
             {/* Verification Modal */}
-			<RewardModal isOpen={isOpen} onOpenChange={onOpenChange} />
+			<RewardModal isOpen={isOpen} onOpenChange={onOpenChange} selectedItem={selectedItem} />
         </section>
     );
 }
