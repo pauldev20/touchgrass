@@ -56,12 +56,12 @@ const extractCoordinates = (url: string): LocationInfo => {
     const matches = [...url.matchAll(markerRegex)];
     if (matches.length >= 2) {
       const origin = {
-        lat: parseFloat(matches[0][1]),
-        lng: parseFloat(matches[0][2])
+        lat: Number.parseFloat(matches[0][1]),
+        lng: Number.parseFloat(matches[0][2])
       };
       const destination = {
-        lat: parseFloat(matches[1][1]),
-        lng: parseFloat(matches[1][2])
+        lat: Number.parseFloat(matches[1][1]),
+        lng: Number.parseFloat(matches[1][2])
       };
       return { origin, destination };
     } else {
@@ -80,12 +80,12 @@ const extractPrice = (text: string): PriceInfo => {
 
     const standardFormat = priceLine.match(/NT\$(\d+\.\d{2})/);
     if (standardFormat) {
-      return { price: parseFloat(standardFormat[1]) };
+      return { price: Number.parseFloat(standardFormat[1]) };
     }
 
     const europeanFormat = priceLine.match(/(\d+),(\d{2})\s*NT\$/);
     if (europeanFormat) {
-      return { price: parseFloat(`${europeanFormat[1]}.${europeanFormat[2]}`) };
+      return { price: Number.parseFloat(`${europeanFormat[1]}.${europeanFormat[2]}`) };
     }
 
     console.log("Price line found:", priceLine);
@@ -123,22 +123,21 @@ const nftContract = {
 	]
 } as const;
 
-// Add ERC20 contract configuration
-const erc20Contract = {
-    abi: [
-        {
-            name: 'transferFrom',
-            type: 'function',
-            inputs: [
-                { name: 'from', type: 'address' },
-                { name: 'to', type: 'address' },
-                { name: 'amount', type: 'uint256' }
-            ],
-            outputs: [{ name: '', type: 'bool' }],
-            stateMutability: 'nonpayable'
-        }
-    ]
-} as const;
+// const erc20Contract = {
+//     abi: [
+//         {
+//             name: 'transferFrom',
+//             type: 'function',
+//             inputs: [
+//                 { name: 'from', type: 'address' },
+//                 { name: 'to', type: 'address' },
+//                 { name: 'amount', type: 'uint256' }
+//             ],
+//             outputs: [{ name: '', type: 'bool' }],
+//             stateMutability: 'nonpayable'
+//         }
+//     ]
+// } as const;
 
 const publicClient = createPublicClient({
   chain: optimism,
@@ -153,7 +152,7 @@ async function verifyNFT(nftAddress: string, accountAddress: string) {
     })
 
     const balance = await contract.read.balanceOf([accountAddress as `0x${string}`])
-    return BigInt(balance) > 0n
+    return Number(balance) > 0
 }
 
 export async function POST(request: Request) {
@@ -171,7 +170,7 @@ export async function POST(request: Request) {
 
         for (const requirement of config.requirements) {
             switch (requirement.type) {
-                case 'uber':
+                case 'uber': {
                     const rawEmail = Buffer.from(email, 'base64').toString('utf-8');
                     console.log("verifying email")
                     const isValidEmail = await verifyEmailDKIM(rawEmail);
@@ -185,13 +184,15 @@ export async function POST(request: Request) {
                         return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
                     }
                     break;
-                case 'nft':
+                }
+                case 'nft': {
                     console.log("verifying nft")
                     const isValidNFT = await verifyNFT(nft, accountAddress);
                     if (!isValidNFT) {
                         return NextResponse.json({ error: 'Invalid NFT' }, { status: 400 });
                     }
                     break;
+                }
             }
         }
 
@@ -241,7 +242,7 @@ export async function POST(request: Request) {
             return new Response(JSON.stringify({ error: 'Transfer failed' }), { status: 500 });
         }
 
-        return NextResponse.json({ message: 'Reward sent successfully' }, { status: 200 });
+        // return NextResponse.json({ message: 'Reward sent successfully' }, { status: 200 });
         
     } catch (error) {
         console.error('Error:', (error as Error).message);
