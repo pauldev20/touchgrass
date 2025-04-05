@@ -1,8 +1,9 @@
 "use client";
 
-import { Button, Card, CardBody, CardFooter, CardHeader, Chip } from "@heroui/react";
+import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Modal, ModalContent, ModalHeader } from "@heroui/react";
 import { SelfBackendVerifier } from "@selfxyz/core";
 import SelfQRcodeWrapper, { SelfAppBuilder } from "@selfxyz/qrcode";
+import { useDisclosure } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -71,15 +72,9 @@ function ClaimCard({
 }
 
 export default function Home() {
-    const [isOpen, setIsOpen] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+	const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [selectedItem, setSelectedItem] = useState<number | null>(null);
-
-    useEffect(() => {
-        if (isOpen) {
-            setUserId(uuidv4());
-        }
-    }, [isOpen]);
 
     //   const selfApp = userId ? new SelfAppBuilder({
     //     appName: "My Application",
@@ -90,14 +85,7 @@ export default function Home() {
 
     const handleRedeem = (itemId: number) => {
         setSelectedItem(itemId);
-        setIsOpen(true);
-    };
-
-    const handleModalClick = (e: React.MouseEvent) => {
-        if (e.target === e.currentTarget) {
-            setIsOpen(false);
-            setSelectedItem(null);
-        }
+        onOpen();
     };
 
     return (
@@ -117,60 +105,29 @@ export default function Home() {
             </div>
 
             {/* Verification Modal */}
-			
-            {/* {isOpen && (
-        <div 
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={handleModalClick}
-        >
-          <div 
-            className="bg-white rounded-3xl shadow-2xl relative max-w-md w-full mx-auto"
-          >
-            <div className="p-10">
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  setSelectedItem(null);
-                }}
-                className="absolute top-8 right-8 text-gray-500 hover:text-gray-700 
-                  transition-colors p-2 hover:bg-gray-100 rounded-full"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-3 text-black">
-                  Verify to Claim
-                </h2>
-                <p className="text-gray-500">
-                  Claiming: {redeemableItems.find(item => item.id === selectedItem)?.title}
-                </p>
-              </div>
-              
-              <div className="bg-white rounded-2xl p-8 flex justify-center">
-                {selfApp && (
-                  <SelfQRcodeWrapper
-                    selfApp={selfApp}
-                    onSuccess={() => {
-                      console.log("Verification successful!");
-                      alert(`Successfully claimed ${redeemableItems.find(item => item.id === selectedItem)?.title}!`);
-                      setIsOpen(false);
-                      setSelectedItem(null);
-                    }}
-                    size={280}
-                  />
-                )}
-              </div>
-              
-              <p className="text-sm text-gray-500 mt-6 text-center">
-                ID: {userId?.substring(0, 8)}...
-              </p>
-            </div>
-          </div>
-        </div>
-      )} */}
+			<Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+				<ModalContent>
+					<ModalHeader className="flex flex-col gap-1">
+						<h1>Verify to Claim</h1>
+						<p className="text-sm font-normal">Claiming: {redeemableItems.find(item => item.id === selectedItem)?.title}</p>
+					</ModalHeader>
+					
+					<div className="bg-white rounded-2xl p-8 flex justify-center">
+						{/* {selfApp && (
+						<SelfQRcodeWrapper
+							selfApp={selfApp}
+							onSuccess={() => {
+							console.log("Verification successful!");
+							alert(`Successfully claimed ${redeemableItems.find(item => item.id === selectedItem)?.title}!`);
+							setIsOpen(false);
+							setSelectedItem(null);
+							}}
+							size={280}
+						/>
+						)} */}
+					</div>
+				</ModalContent>
+			</Modal>
         </section>
     );
 }

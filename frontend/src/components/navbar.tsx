@@ -2,7 +2,6 @@
 
 import { siteConfig } from "@/config/site";
 import {
-    Button,
     Link,
     Navbar,
     NavbarBrand,
@@ -12,6 +11,7 @@ import {
     NavbarMenuItem,
     NavbarMenuToggle,
 } from "@heroui/react";
+import NextLink from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -28,6 +28,10 @@ const menuItems = [
         label: "Rewards",
         href: "/rewards",
     },
+	{
+		label: "Create",
+		href: "/create",
+	}
 ];
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
@@ -36,6 +40,7 @@ function NavItem({ href, children }: { href: string; children: React.ReactNode }
     return (
         <NavbarItem isActive={currentPath === href}>
             <Link
+				as={NextLink}
                 color={currentPath === href ? "primary" : "foreground"}
                 aria-current={currentPath === href ? "page" : undefined}
                 href={href}
