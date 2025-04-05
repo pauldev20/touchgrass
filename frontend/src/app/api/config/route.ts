@@ -83,7 +83,8 @@ export async function POST(request: Request) {
 			name: configData.name,
 			description: configData.description,
 			emoji: configData.emoji,
-			requirements: JSON.stringify(configData.requirements)
+			requirements: JSON.stringify(configData.requirements),
+			wallet: configData.wallet
 		}
 	});
 
