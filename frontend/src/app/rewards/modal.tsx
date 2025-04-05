@@ -5,15 +5,22 @@ import SelfQRcodeWrapper, { countries } from "@selfxyz/qrcode";
 import { Button, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from "@heroui/react";
 import { SelfAppBuilder } from "@selfxyz/core";
 import { useEffect, useState } from "react";
+import type { Reward } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 
-function VerifyUberEmail({ onSuccess }: { onSuccess: () => void }) {
+
+function VerifyUberEmail({ onSuccess }: { onSuccess: (email: string) => void }) {
 	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
-			// TODO: Handle the file upload to your backend
-			console.log('File selected:', file);
-			onSuccess();
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				if (e.target?.result) {
+					const base64String = (e.target.result as string).split(',')[1];
+					onSuccess(base64String);
+				}
+			};
+			reader.readAsDataURL(file);
 		}
 	};
 
@@ -36,10 +43,10 @@ function VerifyUberEmail({ onSuccess }: { onSuccess: () => void }) {
 	)
 }
 
-function VerifyNFTHolding({ onSuccess }: { onSuccess: () => void }) {
+function VerifyNFTHolding({ address, onSuccess }: { address: string, onSuccess: (address: string) => void }) {
 	useEffect(() => {
 		setTimeout(() => {
-			onSuccess();
+			onSuccess(address);
 		}, 1000);
 	}, [onSuccess]);
 
@@ -48,7 +55,7 @@ function VerifyNFTHolding({ onSuccess }: { onSuccess: () => void }) {
 	)
 }
 
-function VerifySelfProtocol({ onSuccess }: { onSuccess: () => void }) {
+function VerifySelfProtocol({ country, onSuccess }: { country: string, onSuccess: (country: string) => void }) {
 	const [mounted, setMounted] = useState(false);
 	useEffect(() => {
 		setMounted(true);
@@ -61,10 +68,7 @@ function VerifySelfProtocol({ onSuccess }: { onSuccess: () => void }) {
         endpoint: `${process.env.NEXT_PUBLIC_API_URL}/api/verifyself/`,
         userId,
 		disclosures: {
-			minimumAge: 20,
-			ofac: true,
-			excludedCountries: [countries.FRANCE],
-			name: true,
+			excludedCountries: [country],
 		}
 	}).build();
 
@@ -73,10 +77,12 @@ function VerifySelfProtocol({ onSuccess }: { onSuccess: () => void }) {
 	}
 
 	return (
-		<div className="bg-white rounded-2xl p-3 flex justify-center" onClick={onSuccess} onKeyDown={onSuccess}>
+		<div className="bg-white rounded-2xl p-3 flex justify-center" onClick={() => onSuccess(country)} onKeyDown={() => onSuccess(country)}>
 			<SelfQRcodeWrapper
 				selfApp={selfApp}
-				onSuccess={onSuccess}
+				onSuccess={() => {
+					onSuccess(country);
+				}}
 				size={250}
 			/>
 		</div>
@@ -85,22 +91,48 @@ function VerifySelfProtocol({ onSuccess }: { onSuccess: () => void }) {
 
 interface RewardModalProps {
 	isOpen: boolean;
+	selectedItem: Reward;
 	onOpenChange: (isOpen: boolean) => void;
 }
-export default function RewardModal({ isOpen, onOpenChange }: RewardModalProps) {
-	const steps = [
-		"uber-email",
-		"nft-holding",
-		"self-protocol",
-		"success"
-	];
+export default function RewardModal({ isOpen, onOpenChange, selectedItem }: RewardModalProps) {
+	const requirements = JSON.parse(selectedItem?.requirements || '[]');
+	const steps = [...requirements.map((req: any) => req.type), "success"];
 	const [currentStep, setCurrentStep] = useState(steps[0]);
 
+	const [uberEmail, setUberEmail] = useState<string | null>(null);
+	const [nftAddress, setNftAddress] = useState<string | null>(null);
+	const [selfCountry, setSelfCountry] = useState<string | null>(null);
+
+	const nftRequirement = requirements.find((req: any) => req.type === "nft");
+	const selfRequirement = requirements.find((req: any) => req.type === "self");
+
 	useEffect(() => {
+		if (isOpen) {
+			setCurrentStep(steps[0]);
+		}
+	}, [isOpen]);
+
+	useEffect(() => {
+		if (steps.length === 1) {
+			return;
+		}
 		if (currentStep === steps[steps.length - 1]) {
 			onOpenChange(false);
+			console.log(uberEmail, nftAddress, selfCountry);
 		}
 	}, [currentStep]);
+
+	const getTitleForStep = (step: string) => {
+		if (step === "success") {
+			return undefined;
+		}
+		const titles: Record<string, string> = {
+			uber: "Verify Uber E-Mail",
+			nft: "Verify NFT Holding",
+			self: "Verify Self Protocol"
+		};
+		return titles[step] || `Verify ${step.charAt(0).toUpperCase() + step.slice(1)}`;
+	};
 
     return (
         <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
@@ -109,18 +141,27 @@ export default function RewardModal({ isOpen, onOpenChange }: RewardModalProps) 
 					<HorizontalStepper
 						className="w-full"
 						currentStep={steps.indexOf(currentStep)}
-						steps={[
-							{title: "Verify Uber E-Mail"},
-							{title: "Verify NFT Holding"},
-							{title: "Verify Self Protocol"}
-						]}
+						steps={steps
+							.map((step: string) => ({
+								title: getTitleForStep(step)
+							}))
+							.filter(step => step.title !== undefined)}
 					/>
 				</ModalHeader>
 
 				<ModalBody className="h-full flex flex-col items-center justify-center pt-0">
-					{currentStep === "uber-email" && <VerifyUberEmail onSuccess={() => setCurrentStep(steps[steps.indexOf(currentStep) + 1])} />}
-					{currentStep === "nft-holding" && <VerifyNFTHolding onSuccess={() => setCurrentStep(steps[steps.indexOf(currentStep) + 1])} />}
-					{currentStep === "self-protocol" && <VerifySelfProtocol onSuccess={() => setCurrentStep(steps[steps.indexOf(currentStep) + 1])} />}
+					{currentStep === "uber" && <VerifyUberEmail onSuccess={(email) => {
+						setUberEmail(email);
+						setCurrentStep(steps[steps.indexOf(currentStep) + 1]);
+					}} />}
+					{currentStep === "nft" && <VerifyNFTHolding address={nftRequirement?.address} onSuccess={(address) => {
+						setNftAddress(address);
+						setCurrentStep(steps[steps.indexOf(currentStep) + 1]);
+					}} />}
+					{currentStep === "self" && <VerifySelfProtocol country={selfRequirement?.country} onSuccess={(country) => {
+						setSelfCountry(country);
+						setCurrentStep(steps[steps.indexOf(currentStep) + 1]);
+					}} />}
 				</ModalBody>
 			</ModalContent>
 		</Modal>
