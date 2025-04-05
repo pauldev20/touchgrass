@@ -8,9 +8,11 @@ import { useEffect, useState } from "react";
 import type { Reward } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 import { siteConfig } from "@/config/site";
+import { useAccount } from "wagmi";
 
 
 function VerifyUberEmail({ onSuccess }: { onSuccess: (email: string) => void }) {
+	
 	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
@@ -114,13 +116,21 @@ export default function RewardModal({ isOpen, onOpenChange, selectedItem }: Rewa
 		}
 	}, [isOpen]);
 
+	const { address } = useAccount();
+
 	useEffect(() => {
 		if (steps.length === 1) {
 			return;
 		}
 		if (currentStep === steps[steps.length - 1]) {
 			onOpenChange(false);
-			console.log(uberEmail, nftAddress, selfCountry);
+			fetch('/api/verify', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ rewardID: selectedItem.id, accountAddress: address, email: uberEmail, nft: nftAddress  }),
+			});
 		}
 	}, [currentStep]);
 
