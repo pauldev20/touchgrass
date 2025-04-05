@@ -100,7 +100,7 @@ export default function Rewards({ rewards }: RewardsProps) {
             </div>
 
             {/* Verification Modal */}
-			<RewardModal isOpen={isOpen} onOpenChange={onOpenChange} selectedItem={selectedItem} />
+			<RewardModal isOpen={isOpen} onOpenChange={onOpenChange} selectedItem={selectedItem!} />
         </section>
     );
 }
