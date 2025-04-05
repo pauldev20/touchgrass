@@ -7,6 +7,7 @@ import { SelfAppBuilder } from "@selfxyz/core";
 import { useEffect, useState } from "react";
 import type { Reward } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
+import { siteConfig } from "@/config/site";
 
 
 function VerifyUberEmail({ onSuccess }: { onSuccess: (email: string) => void }) {
@@ -63,12 +64,13 @@ function VerifySelfProtocol({ country, onSuccess }: { country: string, onSuccess
 
 	const userId = uuidv4();
 	const selfApp = new SelfAppBuilder({
-        appName: "Touchgrass",
+        appName: siteConfig.name,
         scope: "touchgrass",
-        endpoint: `${process.env.NEXT_PUBLIC_API_URL}/api/verifyself/`,
+        endpoint: `${process.env.NEXT_PUBLIC_API_URL}/api/verifyself?test=true`,
         userId,
 		disclosures: {
-			excludedCountries: [country],
+			// excludedCountries: [country],
+			excludedCountries: ["FRA"]
 		}
 	}).build();
 

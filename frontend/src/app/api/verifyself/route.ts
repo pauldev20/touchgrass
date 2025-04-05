@@ -13,12 +13,14 @@ export async function POST(request: Request) {
             );
         }
 
+		console.log(proof, publicSignals);
+
         const configuredVerifier = new SelfBackendVerifier(
             "touchgrass",
-            'https://forno.celo.org',
+            `${process.env.NEXT_PUBLIC_API_URL}`,
             'uuid',
             false
-        ).setMinimumAge(20).excludeCountries(countries.FRANCE);
+        ).excludeCountries(countries.FRANCE);
 
         const result = await configuredVerifier.verify(proof, publicSignals);
         console.log("Verification result:", result);

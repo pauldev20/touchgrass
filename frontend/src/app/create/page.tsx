@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from 'react';
-import { DateInput, Input, Button, Select, SelectItem, NumberInput } from "@heroui/react";
+import { DateInput, Input, Button, Select, SelectItem, NumberInput, Autocomplete } from "@heroui/react";
+import { countries } from "@selfxyz/qrcode";
 import { useSignMessage, useAccount } from 'wagmi';
+
 
 type VerificationType = "wld" | "uber" | "nft" | "self";
 
@@ -25,6 +27,7 @@ const Create: React.FC = () => {
 	const [description, setDescription] = React.useState('');
 	const [emoji, setEmoji] = React.useState('');
 	const [amount, setAmount] = React.useState<number>(0);
+	const [country, setCountry] = React.useState<string>('');
 
 	// const options = useMemo(() => countryList().getData(), [])
 	// const changeHandler = (value: any) => {
@@ -39,9 +42,10 @@ const Create: React.FC = () => {
 		const newElement: VerificationElement = {
 			type: selectedType,
 			id: crypto.randomUUID(),
-			dateRange: { start: '', end: '' }
+			dateRange: { start: '', end: '' },
+			country: country
 		};
-		
+
 		setElements([...elements, newElement]);
 		setSelectedType(null);
 	};
@@ -65,7 +69,8 @@ const Create: React.FC = () => {
 				amount,
 				requirements: elements,
 				description,
-				emoji
+				emoji,
+				country
 			};
 
 			// Sign the stringified config
@@ -205,7 +210,17 @@ const Create: React.FC = () => {
 						)}
 
 						{element.type === "self" && (
-							<div className="flex flex-col gap-4" />
+							<div className="flex flex-col gap-4">
+								<Autocomplete
+									label="Country"
+									value={country}
+									onSelectionChange={(key) => setCountry(key as string)}
+								>
+									{Object.entries(countries).map(([code, name]) => (
+										<SelectItem key={name}>{code}</SelectItem>
+									))}
+								</Autocomplete>
+							</div>
 						)}
 					</div>
 				))}
