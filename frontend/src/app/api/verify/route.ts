@@ -2,6 +2,12 @@
 import { simpleParser, ParsedMail } from 'mailparser';
 // @ts-ignore
 import { dkimVerify } from 'mailauth/lib/dkim/verify';
+import { NextResponse } from 'next/server';
+// import { useReadContract } from 'wagmi';
+// import { useAccount } from 'wagmi';
+import { createPublicClient, http, getContract, createWalletClient, erc20Abi } from 'viem'
+import { baseSepolia, optimism } from 'viem/chains'
+import { privateKeyToAccount } from 'viem/accounts'
 
 interface Coordinates {
   lat: number;
@@ -99,6 +105,133 @@ async function emailInfo(rawEmail: string): Promise<TripInfo | null> {
     } catch (error) {
         console.error('Error:', (error as Error).message);
         return null;
+    }
+}
+
+
+// Add NFT contract configuration
+const nftContract = {
+	abi: [
+		{
+			name: 'balanceOf',
+			type: 'function',
+			inputs: [{ name: 'owner', type: 'address' }],
+			outputs: [{ name: '', type: 'uint256' }],
+			stateMutability: 'view'
+		}
+	]
+} as const;
+
+// Add ERC20 contract configuration
+const erc20Contract = {
+    abi: [
+        {
+            name: 'transferFrom',
+            type: 'function',
+            inputs: [
+                { name: 'from', type: 'address' },
+                { name: 'to', type: 'address' },
+                { name: 'amount', type: 'uint256' }
+            ],
+            outputs: [{ name: '', type: 'bool' }],
+            stateMutability: 'nonpayable'
+        }
+    ]
+} as const;
+
+const publicClient = createPublicClient({
+  chain: optimism,
+  transport: http()
+})
+
+async function verifyNFT(nftAddress: string, accountAddress: string) {
+    const contract = getContract({
+        address: nftAddress as `0x${string}`,
+        abi: nftContract.abi,
+        client: publicClient,
+    })
+
+    const balance = await contract.read.balanceOf([accountAddress as `0x${string}`])
+    return BigInt(balance) > 0n
+}
+
+export async function POST(request: Request) {
+    try {
+        const body = await request.json();
+        const { rewardID, accountAddress, email, nft } = body;
+
+        const configResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/config`);
+        const configs = await configResponse.json();
+        const config = configs.rewards.find((c: any) => c.id === rewardID);
+        console.log(config);
+
+        if (!config) {
+            return NextResponse.json({ error: 'Invalid reward ID' }, { status: 400 });
+        }
+
+        for (const requirement of config.requirements) {
+            switch (requirement.type) {
+                case 'uber':
+                    const rawEmail = Buffer.from(email, 'base64').toString('utf-8');
+                    console.log("verifying email")
+                    const isValidEmail = await verifyEmailDKIM(rawEmail);
+                    if (!isValidEmail) {
+                        console.log("email invalid")
+                        return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
+                    }
+                    const emailData = await emailInfo(rawEmail);
+                    if (!emailData) {
+                        console.log("email data invalid")
+                        return NextResponse.json({ error: 'Invalid email' }, { status: 400 });
+                    }
+                    break;
+                case 'nft':
+                    console.log("verifying nft")
+                    const isValidNFT = await verifyNFT(nft, accountAddress);
+                    if (!isValidNFT) {
+                        return NextResponse.json({ error: 'Invalid NFT' }, { status: 400 });
+                    }
+                    break;
+            }
+        }
+        console.log("transferring reward tokens");
+
+        const privateKey = process.env.NEXT_PRIVATE_KEY?.startsWith('0x') 
+            ? process.env.NEXT_PRIVATE_KEY as `0x${string}`
+            : `0x${process.env.NEXT_PRIVATE_KEY}` as `0x${string}`;
+        const accountP = privateKeyToAccount(privateKey)
+        
+        const client = createWalletClient({
+            account: accountP,
+            chain: baseSepolia,
+            transport: http(),
+        });
+    
+        try {
+            const hash = await client.writeContract({
+                account: accountP,
+                address: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+                abi: erc20Abi,
+                functionName: 'transferFrom',
+                args: [
+                    config.wallet as `0x${string}`,
+                    accountAddress as `0x${string}`,
+                    BigInt(10),
+                ],
+            });
+    
+            console.log('Transaction sent:', hash);
+            return new Response(JSON.stringify({ hash }), { status: 200 });
+        } catch (error) {
+            console.error('Transfer failed:', error);
+            return new Response(JSON.stringify({ error: 'Transfer failed' }), { status: 500 });
+        }
+
+        return NextResponse.json({ message: 'Reward sent successfully' }, { status: 200 });
+        
+    } catch (error) {
+        console.error('Error:', (error as Error).message);
+        return NextResponse.json({ error: 'Error verifying reward' }, { status: 500 });
     }
 }
 
