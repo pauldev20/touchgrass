@@ -74,21 +74,38 @@ export default function Home() {
   };
 
   return (
-    <section className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-8 text-black">Redeemable Items</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <section className="flex flex-col items-center">
+      <h1 className="text-5xl font-bold text-center mb-16">
+        Claim Your Rewards
+      </h1>
+        
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {redeemableItems.map((item) => (
-          <div key={item.id} className="bg-white rounded-lg shadow-md p-6 flex flex-col">
-            <div className="text-4xl mb-4 text-center text-black">{item.image}</div>
-            <h2 className="text-xl font-semibold mb-2 text-black">{item.title}</h2>
-            <p className="text-black flex-grow mb-4">{item.description}</p>
-            <button
-              onClick={() => handleRedeem(item.id)}
-              className="bg-white text-black px-4 py-2 rounded-lg border border-black hover:bg-gray-100 transition-colors"
-            >
-              Redeem
-            </button>
+          <div 
+            key={item.id} 
+            className="group bg-background/40 backdrop-blur-sm rounded-3xl p-8 
+              border border-default-200 hover:border-default-400
+              transition-all duration-300"
+          >
+            <div className="flex flex-col items-center">
+              <div className="text-6xl mb-8 transform group-hover:scale-110 transition-transform duration-300">
+                {item.image}
+              </div>
+              <h2 className="text-2xl font-bold mb-3">
+                {item.title}
+              </h2>
+              <p className="text-default-500 text-center mb-8 text-sm leading-relaxed">
+                {item.description}
+              </p>
+              <button
+                onClick={() => handleRedeem(item.id)}
+                className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-medium 
+                  hover:opacity-90 active:opacity-80 transition-all duration-200
+                  transform group-hover:-translate-y-1"
+              >
+                Claim Now
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -96,43 +113,55 @@ export default function Home() {
       {/* Verification Modal */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={handleModalClick}
         >
-          <div className="verification-container bg-white p-8 rounded-lg shadow-md relative max-w-md w-full mx-4">
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                setSelectedItem(null);
-              }}
-              className="absolute top-4 right-4 text-black hover:text-gray-700"
-            >
-              ✕
-            </button>
-            
-            <h2 className="text-black text-xl mb-2">Verify to Redeem</h2>
-            <p className="text-black mb-4">
-              Redeeming: {redeemableItems.find(item => item.id === selectedItem)?.title}
-            </p>
-            
-            <div className="bg-white p-4">
-              {selfApp && (
-                <SelfQRcodeWrapper
-                  selfApp={selfApp}
-                  onSuccess={() => {
-                    console.log("Verification successful!");
-                    alert(`Successfully redeemed ${redeemableItems.find(item => item.id === selectedItem)?.title}!`);
-                    setIsOpen(false);
-                    setSelectedItem(null);
-                  }}
-                  size={300}
-                />
-              )}
+          <div 
+            className="bg-background rounded-3xl shadow-2xl relative max-w-md w-full mx-auto
+              border border-default-200"
+          >
+            <div className="p-10">
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  setSelectedItem(null);
+                }}
+                className="absolute top-8 right-8 text-default-500 hover:text-default-600 
+                  transition-colors p-2 hover:bg-default-100 rounded-full"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold mb-3">
+                  Verify to Claim
+                </h2>
+                <p className="text-default-500">
+                  Claiming: {redeemableItems.find(item => item.id === selectedItem)?.title}
+                </p>
+              </div>
+              
+              <div className="bg-white rounded-2xl p-8 flex justify-center">
+                {selfApp && (
+                  <SelfQRcodeWrapper
+                    selfApp={selfApp}
+                    onSuccess={() => {
+                      console.log("Verification successful!");
+                      alert(`Successfully claimed ${redeemableItems.find(item => item.id === selectedItem)?.title}!`);
+                      setIsOpen(false);
+                      setSelectedItem(null);
+                    }}
+                    size={280}
+                  />
+                )}
+              </div>
+              
+              <p className="text-sm text-default-400 mt-6 text-center">
+                ID: {userId?.substring(0, 8)}...
+              </p>
             </div>
-            
-            <p className="text-sm text-black">
-              User ID: {userId?.substring(0, 8)}...
-            </p>
           </div>
         </div>
       )}
