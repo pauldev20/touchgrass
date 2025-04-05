@@ -103,6 +103,28 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+<<<<<<< HEAD
+  try {
+    const rewards = await prisma.reward.findMany();
+    
+    // Parse the requirements back to objects since they're stored as strings
+    const formattedRewards = rewards.map((reward: any) => ({
+      ...reward,
+      requirements: JSON.parse(reward.requirements)
+    }));
+
+    return NextResponse.json({
+      rewards: formattedRewards
+    });
+    
+  } catch (error) {
+    console.error('Error fetching rewards:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+=======
 	return NextResponse.json({ message: 'Hello, world!' }, { status: 200 });
 //   try {
 //     const { searchParams } = new URL(request.url);
@@ -125,4 +147,5 @@ export async function GET(request: Request) {
 //       { status: 500 }
 //     );
 //   }
+>>>>>>> baa224387600fcdfe2dc4cc4409120299e92a7df
 }
