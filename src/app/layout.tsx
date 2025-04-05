@@ -5,6 +5,8 @@ import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 import clsx from "clsx";
 
+import CustomNavbar from "@/components/navbar";
+
 
 export const fontSans = Inter({
 	subsets: ["latin"],
@@ -35,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning={true} lang="en">
       <head />
       <body
         className={clsx(
@@ -44,9 +46,12 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-            <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
-              {children}
-            </main>
+			<div className="relative flex h-dvh w-full flex-col overflow-hidden bg-background">
+				<CustomNavbar />
+				<main className="container mx-auto flex flex-1 flex-col items-center justify-center overflow-hidden px-8">
+					{children}
+				</main>
+			</div>
         </Providers>
       </body>
     </html>
