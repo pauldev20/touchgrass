@@ -103,23 +103,22 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const wallet = searchParams.get("wallet");
+    const rewards = await prisma.reward.findMany();
+    
+    // Parse the requirements back to objects since they're stored as strings
+    const formattedRewards = rewards.map((reward: any) => ({
+      ...reward,
+      requirements: JSON.parse(reward.requirements)
+    }));
 
-    if (!wallet) {
-      return NextResponse.json(
-        { error: "Wallet address is required" },
-        { status: 400 }
-      );
-    }
-
-    // In a real app, you'd query your database here
-    const configs = configStore.filter(config => config.wallet === wallet);
-
-    return NextResponse.json({ configs }, { status: 200 });
+    return NextResponse.json({
+      rewards: formattedRewards
+    });
+    
   } catch (error) {
+    console.error('Error fetching rewards:', error);
     return NextResponse.json(
-      { error: "Failed to fetch configurations" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

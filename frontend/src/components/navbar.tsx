@@ -31,7 +31,11 @@ const menuItems = [
 	{
 		label: "Create",
 		href: "/create",
-	}
+	},
+    {
+        label: "Fund",
+        href: "/fund",
+    }
 ];
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {
