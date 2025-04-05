@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { DateInput, Input, Button, Select, SelectItem, NumberInput } from "@heroui/react";
+import { useSignMessage, useAccount } from 'wagmi';
 
 type VerificationType = "wld" | "uber" | "nft" | "self";
 
@@ -16,6 +17,8 @@ interface VerificationElement {
 }
 
 const Create: React.FC = () => {
+	const { address } = useAccount();
+	const { signMessageAsync } = useSignMessage();
 	const [elements, setElements] = React.useState<VerificationElement[]>([]);
 	const [selectedType, setSelectedType] = React.useState<VerificationType | null>(null);
 	const [name, setName] = React.useState('');
@@ -51,11 +54,23 @@ const Create: React.FC = () => {
 
 	const submitData = async () => {
 		try {
-			const config = {
-				wallet: "0x1234567890123456789012345678901234567890", // Replace with actual wallet
+			// Create the config object without signature first
+			const configData = {
+				wallet: address, // Using connected wallet address instead of hardcoded
 				name,
 				amount,
 				requirements: elements,
+			};
+
+			// Sign the stringified config
+			const signature = await signMessageAsync({
+				message: JSON.stringify(configData),
+			});
+
+			// Add signature to final config
+			const config = {
+				...configData,
+				signature,
 			};
 
 			const response = await fetch('/api/config', {
