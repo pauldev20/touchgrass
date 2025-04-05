@@ -8,7 +8,7 @@ import { Providers } from "./providers";
 
 import CustomNavbar from "@/components/navbar";
 
-export const fontSans = Inter({
+const fontSans = Inter({
     subsets: ["latin"],
     variable: "--font-sans",
 });

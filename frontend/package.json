@@ -9,7 +9,7 @@
         "clean": "git clean -xdf .next node_modules",
         "lint": "biome lint",
         "format": "biome check --write .",
-		"postinstall": "prisma generate && prisma migrate deploy"
+        "postinstall": "prisma generate && prisma migrate deploy"
     },
     "dependencies": {
         "@heroui/react": "^2.7.5",
@@ -23,6 +23,7 @@
         "@selfxyz/core": "^0.0.23",
         "@selfxyz/qrcode": "^0.0.17",
         "@tanstack/react-query": "^5.71.10",
+        "@types/mailparser": "^3.4.5",
         "clsx": "2.1.1",
         "framer-motion": "11.13.1",
         "intl-messageformat": "^10.5.0",

@@ -103,6 +103,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+<<<<<<< HEAD
   try {
     const rewards = await prisma.reward.findMany();
     
@@ -123,4 +124,28 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
+=======
+	return NextResponse.json({ message: 'Hello, world!' }, { status: 200 });
+//   try {
+//     const { searchParams } = new URL(request.url);
+//     const wallet = searchParams.get("wallet");
+
+//     if (!wallet) {
+//       return NextResponse.json(
+//         { error: "Wallet address is required" },
+//         { status: 400 }
+//       );
+//     }
+
+//     // In a real app, you'd query your database here
+//     // const configs = configStore.filter(config => config.wallet === wallet);
+
+//     return NextResponse.json({ configs }, { status: 200 });
+//   } catch (error) {
+//     return NextResponse.json(
+//       { error: "Failed to fetch configurations" },
+//       { status: 500 }
+//     );
+//   }
+>>>>>>> baa224387600fcdfe2dc4cc4409120299e92a7df
 }

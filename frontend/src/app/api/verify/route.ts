@@ -1,5 +1,6 @@
-import * as fs from 'fs';
+// import * as fs from 'fs';
 import { simpleParser, ParsedMail } from 'mailparser';
+// @ts-ignore
 import { dkimVerify } from 'mailauth/lib/dkim/verify';
 
 interface Coordinates {
@@ -88,33 +89,33 @@ async function emailInfo(rawEmail: string): Promise<TripInfo | null> {
     try {
         const parsedEmail = await simpleParser(rawEmail);
         const text = parsedEmail.text;
-        const mapUrlMatch = text.match(/https:\/\/maps\.googleapis\.com\/maps\/api\/staticmap[^"'\s]*/);
+        const mapUrlMatch = text?.match(/https:\/\/maps\.googleapis\.com\/maps\/api\/staticmap[^"'\s]*/);
         if (!mapUrlMatch || mapUrlMatch.length === 0) {
             return null;
         }
         const { origin, destination } = extractCoordinates(mapUrlMatch[0]);
-        const { price } = extractPrice(text);
-        return { origin, destination, price, date: parsedEmail.date };
+        const { price } = extractPrice(text!);
+        return { origin, destination, price, date: parsedEmail.date! };
     } catch (error) {
         console.error('Error:', (error as Error).message);
         return null;
     }
 }
 
-function test_uber_email(filePath: string): void {
-    const rawEmail = fs.readFileSync(filePath, 'utf8');
+// function test_uber_email(filePath: string): void {
+//     const rawEmail = fs.readFileSync(filePath, 'utf8');
     
-    verifyEmailDKIM(rawEmail).then(valid => {
-        if (valid) {
-            console.log('Valid');
-        } else {
-            console.log('Invalid');
-        }
-    });
-    emailInfo(rawEmail).then(info => {
-        console.log(info);
-    });
-}
+//     verifyEmailDKIM(rawEmail).then(valid => {
+//         if (valid) {
+//             console.log('Valid');
+//         } else {
+//             console.log('Invalid');
+//         }
+//     });
+//     emailInfo(rawEmail).then(info => {
+//         console.log(info);
+//     });
+// }
 
 // test_email('./email_uber_paul_2.eml');
 // test_email('./email_uber_jacob.eml');
