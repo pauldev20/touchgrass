@@ -1,4 +1,18 @@
-# Touchgrass
+<div align="center">
+    <img src="https://em-content.zobj.net/source/apple/391/bar-chart_1f4ca.png" align="center" width=180 heihgt=180/>
+    <h1>Touch Grass</h1>
+    <p align="center">
+        <a href="https://ethglobal.com/showcase/touch-grass-q4033">ETHGlobal Showcase</a>
+        <br/>
+        <a href="#about">About This Project</a>
+        ·
+        <a href="#technical">How It's Made</a>
+    </p>
+    <br/>
+</div>
+<br/>
+
+# About
 Enabling organizations to reimburse real-world expenses for employees, students, and hackers.
 
 ## Description
