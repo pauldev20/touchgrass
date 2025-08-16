@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://em-content.zobj.net/source/apple/391/bar-chart_1f4ca.png" align="center" width=180 heihgt=180/>
+    <img src="https://em-content.zobj.net/source/apple/419/herb_1f33f.png" align="center" width=180 heihgt=180/>
     <h1>Touch Grass</h1>
     <p align="center">
         <a href="https://ethglobal.com/showcase/touch-grass-q4033">ETHGlobal Showcase</a>
